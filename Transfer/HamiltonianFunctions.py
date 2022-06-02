@@ -3,7 +3,7 @@ import numpy as np
 def HaOscillator(tab_y):
     tab_p = tab_y[:,0]
     tab_q = tab_y[:,1]
-    return 0.5*(np.power(tab_p,2) + np.power(tab_q,2))
+    return 0.5*(np.power(tab_p,2) +np.power(tab_q,2))
 
 def Oscillator(tn,yn):
     return np.array([-yn[1],yn[0]])

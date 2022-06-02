@@ -37,7 +37,7 @@ def parareal(F, f, g, T, y0, dtf, dtg, N, epsilon):
     return lambda_tab
 
 
-def parareal_bis(F,f,g,T,y0,dtf,dtg,N):
+def parareal_bis(F,f,g,T,y0,dtf,dtg,N,epsilon):
     delta_t = T/(N+1)
     kmax = 6
     y_tab = np.zeros((kmax+2,N+2,len(y0)))
