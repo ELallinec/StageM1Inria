@@ -5,16 +5,16 @@ import matplotlib.pyplot as plt
 # Parareal Algorithm
 
 
-def parareal(F, f, g, T, y0, dtf, dtg, N, epsilon):
-    delta_t = T/(N+1)
+def parareal(F, f, g, y0, dtf, dtg, delta_t,T):
+    N = int(T/delta_t)
     kmax = 10
-    lambda_tab_old = np.zeros((len(y0), N+2))
-    lambda_tab = np.zeros((len(y0), N+2))
-    lambda_f = np.zeros((len(y0),N+2))
-    lambda_g = np.zeros((len(y0),N+2))
+    lambda_tab_old = np.zeros((len(y0), N+1))
+    lambda_tab = np.zeros((len(y0), N+1))
+    lambda_f = np.zeros((len(y0),N+1))
+    lambda_g = np.zeros((len(y0),N+1))
     
     lambda_tab_old[:, 0] = np.copy(y0)
-    for n in range(1, N+2):
+    for n in range(1, N+1):
         lambda_tab_old[:, n] = g(F, (n-1)*delta_t, n*delta_t, lambda_tab_old[:, n-1], dtg)
     
     lambda_f[:,0] = np.copy(y0)
@@ -25,35 +25,43 @@ def parareal(F, f, g, T, y0, dtf, dtg, N, epsilon):
         
         lambda_f[:,0] = np.copy(y0)
         lambda_tab[:, 0] = np.copy(y0)
-        for n in range(1,N+2):
+        for n in range(1,N+1):
             lambda_f[:, n] = f(F, (n-1)*delta_t, n*delta_t, lambda_tab_old[:, n-1], dtf) 
             lambda_g[:,n] = g(F, (n-1)*delta_t, n*delta_t, lambda_tab_old[:, n-1], dtg)
-        for n in range(1, N+2):
+        for n in range(1, N+1):
             lambda_tab[:, n] = np.copy(lambda_f[:,n])- np.copy(lambda_g[:,n])+  g(F, (n-1)*delta_t, n*delta_t, lambda_tab[:, n-1], dtg)
         lambda_tab_old = np.copy(lambda_tab)
         print("k:", k)
-        
+        np.linalg.norm(lambda_tab)
         k += 1
     return lambda_tab
 
 
-def parareal_bis(F,f,g,T,y0,dtf,dtg,N):
-    delta_t = T/(N+1)
+def parareal_bis(F,f,g,y0,dtf,dtg,delta_t,T):
     kmax = 6
-    y_tab = np.zeros((kmax+2,N+2,len(y0)))
-    lambda_f = np.zeros((len(y0),N+2))
-    for n in range(kmax+2):
-        y_tab[n,0] = y0 
-    for n in range(1,N+2):
-        y_tab[1,n] = g(F, (n-1)*delta_t, n*delta_t,y_tab[1,n-1], dtg)
-        y_tab[0,n] = f(F, (n-1)*delta_t, n*delta_t,y_tab[0,n-1], dtf)
-    k = 1
-    while k<= kmax:
-        for n in range(1,N+2):
-            lambda_f[:,n] = f(F, (n-1)*delta_t, n*delta_t, y_tab[k,n-1], dtf)-g(F, (n-1)*delta_t, n*delta_t, y_tab[k,n-1], dtg)
-        for n in range(1,N+2):
-            y_tab[k+1,n] = lambda_f[:,n] + g(F, (n-1)*delta_t, n*delta_t, y_tab[k+1,n-1], dtg)
-        print("k:",k)    
+    N = int(T/delta_t)
+    print("T:",T)
+    print("N:",N)
+    print("delta_t:",delta_t)
+    print("dtg",dtg)
+    print("dtf",dtf)
+    y_tab = np.zeros((kmax+2,N+1,len(y0)))
+    lambda_f = np.zeros((len(y0),N+1))
+    
+    y_tab[0,0] = y0 
+    y_tab[1,0] = y0
+    for n in range(1,N+1):
+        y_tab[0,n] = f(F, (n-1)*delta_t, n*delta_t, y_tab[0,n-1], dtf)
+        y_tab[1,n] = g(F, (n-1)*delta_t, n*delta_t, y_tab[1,n-1], dtg)
+    k = 2
+    while k<= kmax+1:
+        y_tab[k,0] = y0
+        for n in range(1,N+1):
+            lambda_f[:,n] = f(F, (n-1)*delta_t, n*delta_t, y_tab[k-1,n-1], dtf)
+            lambda_f[:,n]-= g(F, (n-1)*delta_t, n*delta_t, y_tab[k-1,n-1], dtg)
+        for n in range(1,N+1):
+            y_tab[k,n] = lambda_f[:,n] + g(F, (n-1)*delta_t, n*delta_t, y_tab[k,n-1], dtg)
+        print("k:",k-1)    
         k+=1
     return y_tab    
 
@@ -115,7 +123,7 @@ def parareal_Ha_Oscillator(F, f, g, T, y0, dtf, dtg, N, epsilon):
         lambda_tab_old = np.copy(lambda_tab)
 
         
-        print("k:", k)
+        print("k:", k-1)
         k += 1
     return np.abs(tab_Ha)
 

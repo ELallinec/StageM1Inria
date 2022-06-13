@@ -29,18 +29,18 @@ def small_RK4(f, t0, y0, dt):
 
 def tab_RK4(f, t0, T, y0, dt):
     y = y0
-    m = int((T-t0)/dt)
+    m = round((T-t0)/dt)
     tab_y = np.zeros((len(y0), m+1))
     tab_y[:, 0] = y0
-    for k in range(1, m+1):
-        y = small_RK4(f, t0+(k-1)*dt, y, dt)
-        tab_y[:, k] = y
+    for k in range(m):
+        y = small_RK4(f, t0+k*dt, y, dt)
+        tab_y[:, k+1] = y
     return tab_y
 
 
 def RK4(f, t0, T, y0, dt):
     y = y0
-    m = int((T-t0)/dt)
-    for k in range(1, m+1):
-        y = small_RK4(f, t0+(k-1)*dt, y, dt)
+    m = round((T-t0)/dt)
+    for k in range(m):
+        y = small_RK4(f, t0 + k*dt, y, dt)
     return y
