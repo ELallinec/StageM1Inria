@@ -20,3 +20,10 @@ def HaKepler(tab_y):
     tab_q1 = tab_y[:,2]
     tab_q2 = tab_y[:,3]
     return 0.5*(np.power(tab_p1,2) +np.power(tab_p2,2)) - np.power(np.power(tab_q1,2) +np.power(tab_q2,2),-1/2)
+
+def Vlasov(t,y):
+    x = y[:len(y)//2]
+    v = y[len(y)//2,:]
+    E = np.array([-x[0],x[1]/2,x[2]/2])
+    temp = np.array([0,v[2],-v[1]])
+    return np.reshape(np.array([v,E+temp]),len(y))
