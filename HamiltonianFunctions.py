@@ -1,8 +1,8 @@
 import numpy as np
 
 def HaOscillator(tab_y):
-    tab_p = tab_y[:,0]
-    tab_q = tab_y[:,1]
+    tab_p = tab_y[0]
+    tab_q = tab_y[1]
     return 0.5*(np.power(tab_p,2) + np.power(tab_q,2))
 
 def Oscillator(tn,yn):
@@ -23,7 +23,7 @@ def HaKepler(tab_y):
 
 def Vlasov(t,y):
     x = y[:len(y)//2]
-    v = y[len(y)//2,:]
+    v = y[len(y)//2:]
     E = np.array([-x[0],x[1]/2,x[2]/2])
     temp = np.array([0,v[2],-v[1]])
-    return np.reshape(np.array([v,E+temp]),len(y))
+    return np.concatenate((np.copy(v),E+temp))   
