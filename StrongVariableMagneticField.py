@@ -132,6 +132,15 @@ def tab_RK4_magnetic(f, t0, T, y0, dt,eps):
         tab_y[:, k+1] = y
     return tab_y
 
+def tab_RK4_magnetic_2(f, t0, T, y0, dt,eps):
+    y = y0
+    m = round((T-t0)/dt)
+    tab_y = np.zeros((len(y0), m+1))
+    tab_y[:, 0] = y0
+    for k in range(m):
+        y = small_RK4(f, t0+k*dt-dt/2, y, dt,eps)
+        tab_y[:, k+1] = y
+    return tab_y
 
 def RK4_magnetic(f, t0, T, y0, dt,eps):
     y = y0
@@ -183,8 +192,8 @@ def G4_final_tab(f,s,T,y0,dt,eps):
     m = round((T-s)/dt)
     tab_y = np.zeros((6,m+1))
     tab_y[:,0] = np.concatenate((x,v))
-
     for k in range(m):
+        tempv = v
         x,v = G4(dt,x,v,eps)
         tab_y[:,k+1] = np.concatenate((x,v))
     return tab_y
