@@ -38,7 +38,7 @@ def parareal(F, f, g, y0, dtf, dtg, delta_t,T):
 
 
 def parareal_bis(F,f,g,y0,dtf,dtg,delta_t,T):
-    kmax = 8
+    kmax = 16
     N = int(T/delta_t)
     print("T:",T)
     print("N:",N)
@@ -67,6 +67,34 @@ def parareal_bis(F,f,g,y0,dtf,dtg,delta_t,T):
 
 
 def parareal_bis_vlasov(F,f,g,y0,c,eps,delta_t,T,kmax):
+    N = int(T/delta_t)
+    print("T:",T)
+    print("N:",N)
+    print("delta_t:",delta_t)
+    print("c:",c)
+    print("eps:",eps)
+    print("kmax:", kmax)
+    y_tab = np.zeros((kmax+2,N+1,len(y0)))
+    lambda_f = np.zeros((len(y0),N+1))
+    y_tab[0,0] = y0 
+    y_tab[1,0] = y0
+    for n in range(1,N+1):
+        y_tab[0,n] = f(F, (n-1)*delta_t, n*delta_t, y_tab[0,n-1], c,eps)
+        y_tab[1,n] = g(F, (n-1)*delta_t, n*delta_t, y_tab[1,n-1], c,eps)
+    k = 2
+    while k<= kmax+1:
+        y_tab[k,0] = y0
+        for n in range(1,N+1):
+            lambda_f[:,n] = f(F, (n-1)*delta_t, n*delta_t, y_tab[k-1,n-1], c,eps)
+            lambda_f[:,n]-= g(F, (n-1)*delta_t, n*delta_t, y_tab[k-1,n-1], c,eps)
+        for n in range(1,N+1):
+            y_tab[k,n] = lambda_f[:,n] + g(F, (n-1)*delta_t, n*delta_t, y_tab[k,n-1], c, eps)
+        print("k:",k-1)    
+        k+=1
+    return y_tab  
+
+
+def parareal_bis_magnetic(F,f,g,y0,c,eps,delta_t,T,kmax):
     N = int(T/delta_t)
     print("T:",T)
     print("N:",N)

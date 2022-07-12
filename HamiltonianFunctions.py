@@ -1,8 +1,8 @@
 import numpy as np
 
 def HaOscillator(tab_y):
-    tab_p = tab_y[0]
-    tab_q = tab_y[1]
+    tab_p = tab_y[:,0]
+    tab_q = tab_y[:,1]
     return 0.5*(np.power(tab_p,2) + np.power(tab_q,2))
 
 def Oscillator(tn,yn):
@@ -27,3 +27,12 @@ def Vlasov(t,y):
     E = np.array([-x[0],x[1]/2,x[2]/2])
     temp = np.array([0,v[2],-v[1]])
     return np.concatenate((np.copy(v),E+temp))   
+
+def VariableMagneticField(t,y, eps=0.01):
+    xe = y[:len(y)//2]
+    ve = y[len(y)//2:]
+    xtemp = np.copy(ve)
+    vtemp = 1/(eps*np.sqrt(xe[0]**2+xe[1]**2)) *np.array([-ve[2]*xe[0],-xe[1]*ve[2],ve[0]*xe[0]+ve[1]*xe[1]])+np.array([ve[1],-ve[0],0])
+    return np.concatenate((xtemp,vtemp))
+
+

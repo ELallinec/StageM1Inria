@@ -44,16 +44,48 @@ def sol_ex(F,s,t,y0,c,eps):
 	return ans
 
 
-def sol_approx(F,s,t,y0,c,eps):
-	P = np.zeros((3,3))
-	P[0,0] = 1
-	matA = np.zeros((6,6))	
-	matA[:3,:3] = np.eye(3)+c*eps*(t-s)/2 * R(np.pi/2)+(np.cos(np.sqrt(c)*(t-s))-1-c*eps*(t-s)/2)*P
-	matA[:3,3:] = eps * Rcal((t-s)/eps) + np.sin(np.sqrt(c)*(t-s))/np.sqrt(c) * P
-	matA[3:,:3] = eps/2 * Rcal((t-s)/eps) - np.sin(np.sqrt(c)*(t-s))*np.sqrt(c)*P
-	matA[3:,3:] = R((t-s)/eps)+c*eps*(t-s)/2 *R((t-s)/eps-np.pi/2)+(np.cos(np.sqrt(c)*(t-s))-1-c*eps*(t-s)/2)*P
+def sol_ex_mat(F,s,t,y0,c,eps):
+	gamma = eps/np.sqrt(1-2*c*eps**2)
+	a = (1+np.sqrt(1-2*c*eps**2))/(2*eps)
+	b = (1-np.sqrt(1-2*c*eps**2))/(2*eps)
+	matA = np.longdouble(np.zeros((6,6)))
+	matA[0,0] = np.cos(np.sqrt(c)*(t-s))
+	matA[1,1] = gamma*(a*np.cos(b*(t-s)) -b*np.cos(a*(t-s)))
+	matA[1,2] =  gamma*(a*np.sin(b*(t-s)) -b*np.sin(a*(t-s)))
+	matA[2,1] =  gamma*(b*np.sin(a*(t-s)) -a*np.sin(b*(t-s)))
+	matA[2,2] =  gamma*(a*np.cos(b*(t-s)) -b*np.cos(a*(t-s)))
+	
+	matA[0,3] = np.sin(np.sqrt(c)*(t-s))/np.sqrt(c)
+	matA[1,4] = gamma*(np.sin(a*(t-s)) -np.sin(b*(t-s)))
+	matA[1,5] =  gamma*(np.cos(b*(t-s)) - np.cos(a*(t-s)))
+	matA[2,4] =  gamma*(np.cos(a*(t-s)) - np.cos(b*(t-s)))
+	matA[2,5] =  gamma*(np.sin(a*(t-s)) -np.sin(b*(t-s)))
+	
+	matA[3,0] = -np.sqrt(c)*np.sin(np.sqrt(c)*(t-s))
+	matA[4,1] = gamma*(-a*b*np.sin(b*(t-s)) +a*b*np.sin(a*(t-s)))
+	matA[4,2] =  gamma*(a*b*np.cos(b*(t-s)) -a*b*np.cos(a*(t-s)))
+	matA[5,1] =  gamma*(a*b*np.cos(a*(t-s)) -a*b*np.cos(b*(t-s)))
+	matA[5,2] =  gamma*(-a*b*np.sin(b*(t-s)) + a*b*np.sin(a*(t-s)))
+	
+	matA[3,3] = np.cos(np.sqrt(c)*(t-s))
+	matA[4,4] = gamma*(a*np.cos(a*(t-s)) -b*np.cos(b*(t-s)))
+	matA[4,5] =  gamma*(-b*np.sin(b*(t-s)) + a*np.sin(a*(t-s)))
+	matA[5,4] =  gamma*(-a*np.sin(a*(t-s)) +b*np.sin(b*(t-s)))
+	matA[5,5] =  gamma*(a*np.cos(a*(t-s)) -b*np.cos(b*(t-s)))
+	
 	y = matA.dot(y0)
 	return y
+
+def sol_approx(F,s,t,y0,c,eps):
+	P = np.longdouble(np.zeros((3,3)))
+	P[0,0] = 1
+	matA = np.longdouble(np.zeros((6,6)))
+	matA[:3,:3] = np.eye(3)+c*eps*(t-s)/2 * R(np.pi/2)+(np.cos(np.sqrt(c)*(t-s))-1-c*eps*(t-s)/2)*P
+	matA[:3,3:] = eps * Rcal((t-s)/eps) + np.sin(np.sqrt(c)*(t-s))/np.sqrt(c) * P
+	matA[3:,:3] = eps*c/2 * Rcal((t-s)/eps) - np.sin(np.sqrt(c)*(t-s))*np.sqrt(c)*P
+	matA[3:,3:] = R((t-s)/eps)+c*eps*(t-s)/2 *R((t-s)/eps-np.pi/2)+(np.cos(np.sqrt(c)*(t-s))-1-c*eps*(t-s)/2)*P
+	y = matA.dot(y0)
+	return ybm
 
 
 
@@ -84,7 +116,7 @@ def sol_approx_tab(tab_t,s,x,v,c,eps):
 	matA = np.zeros((6,6))
 	y0 =np.concatenate((x,v))
 	y_tab = np.zeros((len(tab_t),len(y0)))
-	n = 0
+	n =0
 	for t in tab_t:
 		matA = np.zeros((6,6))	
 		matA[:3,:3] = np.eye(3)+c*eps*(t-s)/2 * R(np.pi/2)+(np.cos(np.sqrt(c)*(t-s))-1-c*eps*(t-s)/2)*P
@@ -94,3 +126,5 @@ def sol_approx_tab(tab_t,s,x,v,c,eps):
 		y_tab [n] = matA.dot(y0)
 		n += 1
 	return y_tab
+
+
